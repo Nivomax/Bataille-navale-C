@@ -1,19 +1,3 @@
-/*
-  Bataille Navale 8x8 (bateaux 2,3,4) - "touché = coulé"
-  - 2 joueurs ou vs ordi
-  - Sauvegardes multiples dans un dossier "saves/"
-  - Au démarrage, option 2 = liste des sauvegardes et choix
-
-  Modifs incluses :
-  - Rejouer sans rerun (menu en boucle)
-  - Mode: 1=ordi, 2=2 joueurs (affichage sur plusieurs lignes)
-  - Afficher la grille du joueur UNIQUEMENT après que l'ordi tire (pas au tour du joueur)
-  - Titres: "Grille de X"
-  - Espacement après affichage de grille
-  - Coordonnées: Lignes = lettres (A-H), Colonnes = chiffres (0-7)
-  - Sauvegarde: uniquement avec nom personnalisé (plus d'option auto)
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -33,7 +17,6 @@
 
 #define N 8
 #define MAX_NAME 32
-
 #define SAVE_DIR "saves"
 #define MAX_SAVES 200
 #define MAX_PATH_LEN 512
@@ -44,15 +27,13 @@ typedef struct {
 } Player;
 
 typedef struct {
-    int mode;      // 1 = vs ordi, 2 = 2 joueurs
-    int turn;      // 0 = joueur1, 1 = joueur2/ordi
+    int mode;
     Player p1;
     Player p2;
     char name1[MAX_NAME];
     char name2[MAX_NAME];
 } Game;
 
-/* ----------- Outils de base ----------- */
 
 static void clear_grid(int g[N][N]) {
     for (int i = 0; i < N; i++)
@@ -71,8 +52,6 @@ static void init_game(Game *G) {
     G->mode = 2;
     G->turn = 0;
 }
-
-/* ----------- Affichage coordonnées A-H / 0-7 ----------- */
 
 static char row_label(int r) {
     return (char)('A' + r);
@@ -118,8 +97,6 @@ static void print_own_grid(int own[N][N]) {
         printf("\n");
     }
 }
-
-/* ----------- Placement ----------- */
 
 static int can_place(int own[N][N], int r, int c, int len, int horiz) {
     if (horiz) {
@@ -181,8 +158,6 @@ static int take_shot(Player *attacker, Player *defender, int r, int c) {
         return 0;
     }
 }
-
-/* ----------- Sauvegarde / Chargement (fichier texte) ----------- */
 
 static void ensure_save_dir(void) {
     if (MKDIR(SAVE_DIR) != 0) {
@@ -264,8 +239,6 @@ static int load_game(Game *G, const char *filename) {
     return 1;
 }
 
-/* ----------- Liste des sauvegardes ----------- */
-
 static int list_saves(char saves[MAX_SAVES][MAX_PATH_LEN]) {
     int count = 0;
     ensure_save_dir();
@@ -313,9 +286,7 @@ static void flush_stdin(void) {
     while ((ch = getchar()) != '\n' && ch != EOF) {}
 }
 
-/* ----------- Tours ----------- */
 
-/* IMPORTANT: au tour HUMAIN on n'affiche QUE la grille de tirs */
 static void show_shots_only(Player *me) {
     printf("Grille de tirs (chez l'adversaire):\n");
     print_shots_grid(me->shots);
@@ -390,7 +361,6 @@ static int human_turn(Game *G, Player *me, Player *enemy, const char *meName) {
     return 1;
 }
 
-/* Tour IA : on affiche la grille du joueur APRES le tir de l'ordi (comme demandé) */
 static int ai_turn(Player *ai, Player *human, const char *humanName, Player *humanPlayerForDisplay) {
     int r, c;
     while (1) {
@@ -413,7 +383,6 @@ static int ai_turn(Player *ai, Player *human, const char *humanName, Player *hum
     return 1;
 }
 
-/* ----------- Partie (une session) ----------- */
 
 static void setup_new_game(Game *G) {
     init_game(G);
@@ -523,7 +492,6 @@ static void play_game(Game *G) {
     }
 }
 
-/* ----------- MAIN (menu en boucle) ----------- */
 
 int main(void) {
     srand((unsigned)time(NULL));
@@ -533,7 +501,7 @@ int main(void) {
     while (1) {
         printf("BATAILLE NAVALE 8x8 (bateaux 2,3,4) - touche=coule\n");
         printf("1) Nouvelle partie\n");
-        printf("2) Charger une sauvegarde (dossier '%s')\n", SAVE_DIR);
+        printf("2) Charger une sauvegarde\n", SAVE_DIR);
         printf("0) Quitter\n");
         printf("> ");
 
