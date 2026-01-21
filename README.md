@@ -10,5 +10,5 @@
 <img src="Capture d’écran 2026-01-21 à 04.14.33.png">
 
 ## In game :
-<img src="Capture d’écran 2026-01-21 à 04.12.45.png">
+<img src="Capture d’écran 2026-01-21 à 04.24.33.png">
 
