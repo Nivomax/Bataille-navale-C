@@ -17,6 +17,7 @@
 
 #define N 8
 #define MAX_NAME 32
+
 #define SAVE_DIR "saves"
 #define MAX_SAVES 200
 #define MAX_PATH_LEN 512
@@ -28,12 +29,12 @@ typedef struct {
 
 typedef struct {
     int mode;
+    int turn;
     Player p1;
     Player p2;
     char name1[MAX_NAME];
     char name2[MAX_NAME];
 } Game;
-
 
 static void clear_grid(int g[N][N]) {
     for (int i = 0; i < N; i++)
@@ -144,7 +145,6 @@ static int remaining_boat_cells(int own[N][N]) {
 }
 
 static int take_shot(Player *attacker, Player *defender, int r, int c) {
-    // returns 1 if hit, 0 if miss, -1 invalid / already tried
     if (r < 0 || r >= N || c < 0 || c >= N) return -1;
     if (attacker->shots[r][c] != 0) return -1;
 
@@ -154,7 +154,7 @@ static int take_shot(Player *attacker, Player *defender, int r, int c) {
         return 1;
     } else {
         attacker->shots[r][c] = 2;
-        if (defender->own[r][c] == 0) defender->own[r][c] = 2; // optionnel affichage
+        if (defender->own[r][c] == 0) defender->own[r][c] = 2;
         return 0;
     }
 }
@@ -162,7 +162,6 @@ static int take_shot(Player *attacker, Player *defender, int r, int c) {
 static void ensure_save_dir(void) {
     if (MKDIR(SAVE_DIR) != 0) {
         if (errno != EEXIST) {
-            // on ne bloque pas tout, mais possible souci
         }
     }
 }
@@ -286,11 +285,10 @@ static void flush_stdin(void) {
     while ((ch = getchar()) != '\n' && ch != EOF) {}
 }
 
-
 static void show_shots_only(Player *me) {
     printf("Grille de tirs (chez l'adversaire):\n");
     print_shots_grid(me->shots);
-    printf("\n"); // espacement demandé
+    printf("\n");
 }
 
 static int human_turn(Game *G, Player *me, Player *enemy, const char *meName) {
@@ -299,7 +297,7 @@ static int human_turn(Game *G, Player *me, Player *enemy, const char *meName) {
     show_shots_only(me);
 
     printf("Tape une commande:\n");
-    printf("  t L C  -> tirer Ligne(Lettre A-H) Colonne(0-7) (ex: t C 4)\n");
+    printf("  t L C  -> tirer (ex: t C 4)\n");
     printf("  s      -> sauvegarder\n");
     printf("  q      -> quitter (sans sauvegarder)\n");
     printf("> ");
@@ -311,7 +309,7 @@ static int human_turn(Game *G, Player *me, Player *enemy, const char *meName) {
         ensure_save_dir();
 
         char filename[128];
-        printf("Nom du fichier (sans espaces, ex: partie1.txt) : ");
+        printf("Nom du fichier : ");
         if (scanf("%127s", filename) != 1) {
             printf("Nom invalide.\n");
             flush_stdin();
@@ -383,7 +381,6 @@ static int ai_turn(Player *ai, Player *human, const char *humanName, Player *hum
     return 1;
 }
 
-
 static void setup_new_game(Game *G) {
     init_game(G);
 
@@ -397,11 +394,11 @@ static void setup_new_game(Game *G) {
     if (m != 1 && m != 2) m = 2;
     G->mode = m;
 
-    printf("Nom joueur 1 (sans espaces): ");
+    printf("Nom joueur 1 : ");
     scanf("%31s", G->name1);
 
     if (G->mode == 2) {
-        printf("Nom joueur 2 (sans espaces): ");
+        printf("Nom joueur 2 : ");
         scanf("%31s", G->name2);
     } else {
         strcpy(G->name2, "ORDI");
@@ -491,7 +488,6 @@ static void play_game(Game *G) {
         G->turn = 1 - G->turn;
     }
 }
-
 
 int main(void) {
     srand((unsigned)time(NULL));
