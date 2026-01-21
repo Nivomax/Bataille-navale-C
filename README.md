@@ -1,6 +1,10 @@
-# Site web : EFREI'STIVAL 🎵
-https://nivomax.github.io/EFREI-STIVAL/
+# Projet : Bataille navale en C 
+
 <img src="Capture d’écran 2026-01-21 à 04.12.45.png">
+
+<img src="Capture d’écran 2026-01-21 à 04.13.52.png">
+
+<img src="Capture d’écran 2026-01-21 à 04.14.33.png">
 
 ## CONTEXTE :
 
